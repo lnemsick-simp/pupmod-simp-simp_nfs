@@ -1,6 +1,27 @@
 * Mon Mar 16 2020 Liz Nemsick <lnemsick.simp@gmail.com> - 0.3.0
-- Drop support for EL7
+- Drop support for EL6
 - Add support for EL8
+- Noteworthy changes
+  - simp_nfs::home_dir_server and simp_nfs::mount::home::nfs_server must
+    now be an IP address in order to support firewalld.
+  - Removed obsolete simp_nfs::create_home_dirs::strip_128_bit_ciphers
+    that enabled a workaround for EL6.
+  - Added the following optional parameters to simp_nfs::mount::home that
+    allow the user to control the stunnel connection for the home mount:
+    - simp_nfs::mount::home::stunnel
+    - simp_nfs::mount::home::stunnel_nfsd_port
+    - simp_nfs::mount::home::stunnel_socket_options
+    - simp_nfs::mount::home::stunnel_verify
+    - simp_nfs::mount::home::stunnel_wantedby
+- Removed dead code in simp_nfs::mount::home that attempted to detect if
+  the server was also the NFS server.
+  * This code used a non-existent variable to set an unused variable.
+  * If this logic was 'fixed', it would introduce a problem whereby a NFS
+    server could not mount home directories from another NFS server.
+- Removed unnecessary inheritance of simp_nfs by simp_nfs::export::home.
+- Added checks for nfs::is_server and nfs::is_client in simp_nfs::export::home
+  and simp_nfs::mount::home, respectively. The export and mount logic will not
+  work otherwise.
 
 * Wed Jul 03 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.2.0
 - Documentation update

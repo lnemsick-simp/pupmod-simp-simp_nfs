@@ -1,9 +1,9 @@
 # @summary Configures an NFS server to share centralized home directories via NFSv4
 #
-# Sets up the export root at ``${data_dir}/nfs/exports`` and then adds
-# ``${data_dir}/nfs/home`` and submounts it under ``${data_dir}/nfs/exports``.
+# Sets up the export root at `${data_dir}/nfs/exports` and then adds
+# `${data_dir}/nfs/home` and submounts it under `${data_dir}/nfs/exports`.
 
-# It should be mounted as ``$nfs_server:/home`` from your clients.
+# It should be mounted as `$nfs_server:/home` from your clients.
 #
 # The NFS clients must be provided with the hostname of the NFS server:
 #
@@ -33,16 +33,21 @@
 # @author https://github.com/simp/pupmod-simp-simp_nfs/graphs/contributors
 #
 class simp_nfs::export::home (
-  Stdlib::Absolutepath                             $data_dir         = '/var',
-  Simplib::Netlist                                 $trusted_nets     = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
-  Array[Enum['none','sys','krb5','krb5i','krb5p']] $sec              = ['sys'],
-  Boolean                                          $create_home_dirs = simplib::lookup('simp_options::ldap', { 'default_value' => false })
-) inherits simp_nfs {
-  include '::nfs::server'
+  Stdlib::Absolutepath       $data_dir         = '/var',
+  Simplib::Netlist           $trusted_nets     = simplib::lookup('simp_options::trusted_nets', { 'default_value' => ['127.0.0.1'] }),
+  Array[Nfs::SecurityFlavor] $sec              = ['sys'],
+  Boolean                    $create_home_dirs = simplib::lookup('simp_options::ldap', { 'default_value' => false })
+) {
 
-  if $create_home_dirs { include '::simp_nfs::create_home_dirs' }
+  include 'nfs'
 
-  if !$::nfs::stunnel {
+  unless $nfs::is_server {
+    fail('This host is not configured to be a NFS server. Set nfs::is_server to true to fix.')
+  }
+
+  if $create_home_dirs { include 'simp_nfs::create_home_dirs' }
+
+  if !$nfs::server::stunnel {
     nfs::server::export { 'nfs4_root':
       clients     => simplib::nets2cidr($trusted_nets),
       export_path => "${data_dir}/nfs/exports",

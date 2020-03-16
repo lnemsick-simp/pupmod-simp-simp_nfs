@@ -11,8 +11,14 @@ fixtures:
     autofs: https://github.com/simp/pupmod-simp-autofs
     compliance_markup: https://github.com/simp/pupmod-simp-compliance_markup
     concat: https://github.com/simp/puppetlabs-concat
+    firewalld:
+      repo: https://github.com/simp/pupmod-voxpupuli-firewalld
+      ref: v4.2.4
     logrotate: https://github.com/simp/pupmod-simp-logrotate
-    nfs: https://github.com/simp/pupmod-simp-nfs
+#    nfs: https://github.com/simp/pupmod-simp-nfs
+    nfs:
+      repo: https://github.com/lnemsick-simp/pupmod-simp-nfs
+      branch: SIMP-7591
     simplib: https://github.com/simp/pupmod-simp-simplib
     stdlib: https://github.com/simp/puppetlabs-stdlib
     svckill: https://github.com/simp/pupmod-simp-svckill
@@ -40,3 +46,6 @@ fixtures:
     sudo: https://github.com/simp/pupmod-simp-sudo
     systemd: https://github.com/simp/puppet-systemd
     tcpwrappers: https://github.com/simp/pupmod-simp-tcpwrappers
+
+  symlinks:
+    simp_nfs: "#{source_dir}"

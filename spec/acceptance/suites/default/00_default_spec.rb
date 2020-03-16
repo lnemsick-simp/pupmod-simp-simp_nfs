@@ -6,7 +6,7 @@ describe 'simp_nfs stock classes' do
   servers = hosts_with_role( hosts, 'nfs_server' )
   clients = hosts_with_role( hosts, 'client' )
   el7_server = fact_on(only_host_with_role(servers, 'el7'), 'fqdn')
-  el6_server = fact_on(only_host_with_role(servers, 'el6'), 'fqdn')
+  el8_server = fact_on(only_host_with_role(servers, 'el8'), 'fqdn')
 
   context 'with exported home directories' do
     hosts.each do |node|
@@ -15,10 +15,10 @@ describe 'simp_nfs stock classes' do
       os = fact_on(node, 'operatingsystem')
       if os =~ /CentOS|RedHat|OracleLinux/
         os_release = fact_on(node, 'operatingsystemmajrelease')
-        if os_release == '6'
-          server = el6_server
-        elsif os_release == '7'
+        if os_release == '7'
           server = el7_server
+        elsif os_release == '8'
+          server = el8_server
         else
           STDERR.puts "#{os_release} not a supported OS release"
           next
@@ -194,11 +194,6 @@ memberUid: test.user
       servers.each do |node|
         # Create test.user's homedir via cron, and ensure it gets mounted
         on(node, '/etc/cron.hourly/create_home_directories.rb')
-        #FIXME workaround for script not working on el6 of some sort?
-        if fact_on(node, 'operatingsystemmajrelease') == '6'
-          on(node, 'mkdir -p /var/nfs/home/test.user')
-          on(node, 'chown test.user:test.user /var/nfs/home/test.user')
-        end
         on(node, 'ls /var/nfs/home/test.user')
         on(node, "runuser -l test.user -c 'touch ~/testfile'")
         mount = on(node, "mount")

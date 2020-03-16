@@ -84,7 +84,7 @@ include 'simp_nfs'
 ```yaml
 ---
 simp_options::stunnel: true
-simp_nfs::home_dir_server : <your NFS server IP or Hostname>
+simp_nfs::home_dir_server : <your NFS server IP>
 ```
 
 ### Mount Home NFS Directories on another NFS server
@@ -96,10 +96,13 @@ Note: Use the port parameter if you are using stunnel and set it to a different
 port then the one the local NFS server is using.
 
 ```ruby
-class  mounthome {
+class  mounthome (
+  Simplib::Ip   $home_server,
+  Simplib::port $nfsd_port = 12049
+) {
   class { simp_nfs::mount::home :
-    nfs_server => $home_server,
-    port  => 12049,
+    nfs_server        => $home_server,
+    port              => $nfsd_port,
     autodetect_remote => false
   }
 }

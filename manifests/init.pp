@@ -3,41 +3,48 @@
 # @param export_home_dirs
 #   Set up home directory exports for this system
 #
-#   * The ``simp_options::trusted_nets`` parameter will govern what clients may
+#   * The `simp_options::trusted_nets` parameter will govern what clients may
 #     connect to the share by default.
 #   * Further configuration for home directory exports can be tweaked via the
-#     parameters in ``simp_nfs::export_home``
+#     parameters in `simp_nfs::export::home`
 #
 # @param home_dir_server
-#   If set, specifies the server from which you want to mount NFS home
-#   directories for your users
+#   If set, specifies the IP address of the server from which you want to mount
+#   NFS home directories for your users
 #
-#   * If ``$export_home_dirs`` is also set, this class will assume that you
-#     want to mount on the local server if this is set at all
+#   * If `$export_home_dirs` is also set, this class will assume that you
+#     want to mount on the local server if this is set at all.
+#
+#     * If the home directories other than the ones this server exports
+#       should be mounted, do *not* set this parameter, and instead,
+#       include and configure `simp_nfs::mount::home` in this server's manifest.
 #   * Further configuration for the home directory mounts can be tweaked via
-#     the parameters in ``simp_nfs::mount::home``
+#     the parameters in `simp_nfs::mount::home`
 #
 # @param autodetect_remote
-#   Use inbuilt autodetection to determine if the local system is the server
-#   from which we should be mouting directories
+#   Attempts to figure out if this host is also the NFS server and adjust
+#   the connection to the local IP address, `127.0.0.1`, in lieu of the
+#   IP address specified in `$nfs_server`.
 #
-#   * Generally, you should set this to ``false`` if you have issues with the
-#     system mounting to ``127.0.0.1`` when your home directories are actually
-#     on another system
+#   * When you know this host is also the NFS server, setting `$nfs_server`
+#     to `127.0.0.1` is best.
+#   * Auto-detect logic only works with IPv4 addresses.
 #
 # @param use_autofs
-#   Use ``autofs`` for home directory mounts
+#   Use `autofs` for home directory mounts
+#
+# @author https://github.com/simp/pupmod-simp-simp_nfs/graphs/contributors
 #
 class simp_nfs (
-  Boolean                 $export_home_dirs  = false,
-  Optional[Simplib::Host] $home_dir_server   = undef,
-  Boolean                 $autodetect_remote = true,
-  Boolean                 $use_autofs        = true
+  Boolean               $export_home_dirs  = false,
+  Optional[Simplib::Ip] $home_dir_server   = undef,
+  Boolean               $autodetect_remote = true,
+  Boolean               $use_autofs        = true
 ) {
   if $export_home_dirs {
     class { 'nfs': * => { 'is_server' => true } }
 
-    include '::simp_nfs::export::home'
+    include 'simp_nfs::export::home'
 
     if $home_dir_server {
       class { 'simp_nfs::mount::home':
