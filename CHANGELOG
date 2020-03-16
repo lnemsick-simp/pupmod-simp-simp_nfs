@@ -1,3 +1,7 @@
+* Mon Mar 16 2020 Liz Nemsick <lnemsick.simp@gmail.com> - 0.3.0
+- Drop support for EL7
+- Add support for EL8
+
 * Wed Jul 03 2019 Trevor Vaughan <tvaughan@onyxpoint.com> - 0.2.0
 - Documentation update
 - Fix acceptance tests
