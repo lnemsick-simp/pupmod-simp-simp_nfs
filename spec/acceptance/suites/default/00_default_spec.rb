@@ -205,9 +205,12 @@ puts "trusted_nets=#{trusted_nets}"
         it "should set up NFS client on #{node}" do
           set_hieradata_on(node, hieradata, 'default')
           on(node, 'mkdir -p /usr/local/sbin/simp')
-          apply_manifest_on(node, manifest, catch_failures: true)
-          apply_manifest_on(node, manifest, catch_failures: true)
-          apply_manifest_on(node, manifest, catch_changes: true)
+          client_manifest = manifest +
+            "Class['sssd::service'] -> Class['simp_nfs::mount::home']\n"
+
+          apply_manifest_on(node, client_manifest, catch_failures: true)
+          apply_manifest_on(node, client_manifest, catch_failures: true)
+          apply_manifest_on(node, client_manifest, catch_changes: true)
         end
       end
     end
@@ -225,7 +228,7 @@ puts "trusted_nets=#{trusted_nets}"
 
     it 'should have file propagation to the clients' do
       clients.each do |node|
-        on(node, 'cd /mnt/test.user; ls testfile')
+        retry_on(node, 'cd /mnt/test.user; ls testfile', :verbose => true.to_s) #beaker bug requires string
       end
     end
   end
