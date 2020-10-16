@@ -59,7 +59,10 @@ puts "trusted_nets=#{trusted_nets}"
         ---
 
         simp_nfs::home_dir_server: #{nfs_server_ip}
+        # don't mount to /home or vagrant will not be able to login!
         simp_nfs::mount::home::local_home: /mnt
+        simp_nfs::mount::home::options: 'soft,retrans=1,retry=0'
+
 
         # Options
         simp_options::clamav: false
